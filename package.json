@@ -18,6 +18,9 @@
     "vite-plugin-solid": "^2.11.6"
   },
   "dependencies": {
+    "daisyui": "^5.0.50",
+    "install": "^0.13.0",
+    "npm": "^11.5.2",
     "solid-js": "^1.9.5"
   }
 }
