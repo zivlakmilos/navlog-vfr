@@ -1,10 +1,11 @@
 import { createEffect, type Component } from 'solid-js';
-import { generalStore } from './utils/Storage';
+import { generalStore, weatherStore } from './utils/Storage';
 
 // Get wind: https://aviationweather.gov/api/data/metar?ids=LYBE&format=json
 
 const Home: Component = () => {
   const [generalInfo, setGeneralInfo] = generalStore;
+  const [weatherInfo, setWeatherInfo] = weatherStore;
 
   const updateGeneralInfo = (key: string, val: any) => {
     setGeneralInfo(prev => {
@@ -13,9 +14,12 @@ const Home: Component = () => {
     });
   }
 
-  createEffect(() => {
-    console.log(generalInfo());
-  });
+  const updateWeatherInfo = (key: string, val: any) => {
+    setWeatherInfo(prev => {
+      prev[key] = val;
+      return prev;
+    });
+  }
 
   return (
     <div class="w-full p-5">
@@ -65,11 +69,11 @@ const Home: Component = () => {
             </fieldset>
             <fieldset class="fieldset">
               <legend class="fieldset-legend">Wind Direction:</legend>
-              <input type="text" class="input" placeholder="" />
+              <input type="number" class="input" value={weatherInfo().windDirection} onInput={e => updateWeatherInfo("windDirection", +e.target.value)} />
             </fieldset>
             <fieldset class="fieldset">
               <legend class="fieldset-legend">Wind Speed:</legend>
-              <input type="text" class="input" placeholder="" />
+              <input type="number" class="input" value={weatherInfo().windSpeed} onInput={e => updateWeatherInfo("windSpeed", +e.target.value)} />
             </fieldset>
           </form>
         </div>

@@ -17,4 +17,18 @@ export const generalStore = createSignal<TGeneralStore>({
   time: "12:00",
 }, { equals: false });
 
+type TWeatherStore = {
+  metar: string,
+  taf: string,
+  windDirection: number,
+  windSpeed: number,
+}
+
+export const weatherStore = createSignal<TWeatherStore>({
+  metar: "",
+  taf: "",
+  windDirection: 0,
+  windSpeed: 0,
+}, { equals: false });
+
 export const routeStore = createStore([]);
