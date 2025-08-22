@@ -1,7 +1,7 @@
 import { createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 
-type TGeneralStore = {
+export type TGeneralStore = {
   airplane: string,
   departure: string,
   destination: string,
@@ -17,7 +17,7 @@ export const generalStore = createSignal<TGeneralStore>({
   time: "12:00",
 }, { equals: false });
 
-type TWeatherStore = {
+export type TWeatherStore = {
   metar: string,
   taf: string,
   windDirection: number,
@@ -31,4 +31,27 @@ export const weatherStore = createSignal<TWeatherStore>({
   windSpeed: 0,
 }, { equals: false });
 
-export const routeStore = createStore([]);
+export type THeadingStore = {
+  id: number,
+  from: string,
+  to: string,
+  frequency: string,
+  trueCourse: number,
+  trueHeading: number,
+  magneticHeading: number,
+  heading: number,
+
+  airSpeed: number,
+  groudSpeed: number,
+  fuelLeg: number,
+  fuelRem: number,
+  distLeg: number,
+  distRem: number,
+
+  ete: number,
+  corr: number,
+  eta: string,
+  ata: string,
+}
+
+export const headingStore = createStore<THeadingStore[]>([]);
