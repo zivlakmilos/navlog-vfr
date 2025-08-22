@@ -1,8 +1,22 @@
-import type { Component } from 'solid-js';
+import { createEffect, type Component } from 'solid-js';
+import { generalStore } from './utils/Storage';
 
 // Get wind: https://aviationweather.gov/api/data/metar?ids=LYBE&format=json
 
 const Home: Component = () => {
+  const [generalInfo, setGeneralInfo] = generalStore;
+
+  const updateGeneralInfo = (key: string, val: any) => {
+    setGeneralInfo(prev => {
+      prev[key] = val;
+      return prev;
+    });
+  }
+
+  createEffect(() => {
+    console.log(generalInfo());
+  });
+
   return (
     <div class="w-full p-5">
       <div class="collapse collapse-arrow bg-base-100 border border-base-300 m-5">
@@ -19,15 +33,19 @@ const Home: Component = () => {
             </fieldset>
             <fieldset class="fieldset">
               <legend class="fieldset-legend">Departure:</legend>
-              <input type="text" class="input" placeholder="LYNS" />
+              <input type="text" class="input" value={generalInfo().departure} onInput={e => updateGeneralInfo("departure", e.target.value)} />
             </fieldset>
             <fieldset class="fieldset">
               <legend class="fieldset-legend">Destination:</legend>
-              <input type="text" class="input" placeholder="LYNS" />
+              <input type="text" class="input" value={generalInfo().departure} onInput={e => updateGeneralInfo("destination", e.target.value)} />
             </fieldset>
             <fieldset class="fieldset">
               <legend class="fieldset-legend">Date:</legend>
-              <input type="date" class="input" />
+              <input type="date" class="input" value={generalInfo().date} onInput={e => updateGeneralInfo("date", e.target.value)} />
+            </fieldset>
+            <fieldset class="fieldset">
+              <legend class="fieldset-legend">Time:</legend>
+              <input type="time" class="input" value={generalInfo().time} onInput={e => updateGeneralInfo("time", e.target.value)} />
             </fieldset>
           </form>
         </div>
