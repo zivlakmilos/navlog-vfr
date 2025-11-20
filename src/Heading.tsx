@@ -85,6 +85,10 @@ const Heading: Component = () => {
               <legend class="fieldset-legend">Air Speed:</legend>
               <input type="text" class="input" value={heading[id()].airSpeed} onInput={e => updateHeading("airSpeed", +e.target.value)} />
             </fieldset>
+            <fieldset class="fieldset">
+              <legend class="fieldset-legend">Distance:</legend>
+              <input type="text" class="input" value={heading[id()].distLeg} onInput={e => updateHeading("distLeg", +e.target.value)} />
+            </fieldset>
 
             <button type="button" class="btn btn-success m-1 mt-5" onClick={onSaveClicked}>Save</button>
           </form>
