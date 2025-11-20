@@ -1,10 +1,15 @@
-import { A, useParams } from '@solidjs/router';
+import { A, useNavigate, useParams } from '@solidjs/router';
 import { createSignal, type Component } from 'solid-js';
-import { generalStore, headingStore, type THeadingStore } from './utils/Storage';
+import { generalStore, headingStore, weatherStore, type THeadingStore } from './utils/Storage';
+import { calculateAll } from './utils/Calculations';
+import { airplanes } from './utils/Data';
 
 const Heading: Component = () => {
   const [generalInfo] = generalStore;
   const [heading, setHeading] = headingStore;
+  const [weather] = weatherStore;
+
+  const navigate = useNavigate();
 
   const params = useParams()
   const isNew = params.id === undefined;
@@ -18,8 +23,11 @@ const Heading: Component = () => {
       to: "",
       frequency: newId === 0 ? "123.500" : heading[newId - 1].frequency,
       trueCourse: 0,
+      windCorrectionAngle: 0,
       trueHeading: 0,
+      variation: 0,
       magneticHeading: 0,
+      deviation: 0,
       heading: 0,
 
       airSpeed: 0,
@@ -37,10 +45,17 @@ const Heading: Component = () => {
     setId(newId);
   }
 
-  console.log(params.id, id(), isNew, heading.length);
-
   const updateHeading = (key: keyof THeadingStore, value: any) => {
     setHeading(h => h.id === id(), key, value);
+  }
+
+  const onSaveClicked = () => {
+    let airplane = airplanes.find(v => v.registration === generalInfo().airplane);
+    if (!airplane) {
+      airplane = airplanes[0];
+    }
+    setHeading(heading => calculateAll(heading, weather(), airplane));
+    navigate("/", { replace: true });
   }
 
   return (
@@ -71,7 +86,7 @@ const Heading: Component = () => {
               <input type="text" class="input" value={heading[id()].airSpeed} onInput={e => updateHeading("airSpeed", +e.target.value)} />
             </fieldset>
 
-            <A class="btn btn-success m-1 mt-5" href="/">Save</A>
+            <button type="button" class="btn btn-success m-1 mt-5" onClick={onSaveClicked}>Save</button>
           </form>
         </div>
       </div>
@@ -79,4 +94,4 @@ const Heading: Component = () => {
   );
 };
 
-export default Heading;
+export default Heading

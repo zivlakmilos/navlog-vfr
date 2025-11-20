@@ -1,6 +1,7 @@
-import { createEffect, For, type Component } from 'solid-js';
+import { createEffect, createSignal, For, type Component } from 'solid-js';
 import { generalStore, headingStore, TGeneralStore, weatherStore } from './utils/Storage';
 import { A } from '@solidjs/router';
+import { airplanes, TAirplane } from './utils/Data';
 
 // Get wind: https://aviationweather.gov/api/data/metar?ids=LYBE&format=json
 
@@ -23,6 +24,13 @@ const Home: Component = () => {
     });
   }
 
+  const onAirplaneChanged = (value: string) => {
+    setGeneralInfo(prev => {
+      prev.airplane = value;
+      return prev;
+    });
+  }
+
   return (
     <div class="w-full p-5">
       <div class="collapse collapse-arrow bg-base-100 border border-base-300 m-5">
@@ -32,9 +40,12 @@ const Home: Component = () => {
           <form class="w-full">
             <fieldset class="fieldset">
               <legend class="fieldset-legend">Airplane:</legend>
-              <select class="select">
+              <select class="select" onChange={e => onAirplaneChanged(e.target.value)}>
                 <option disabled selected>Airplane</option>
-                <option>YU-ZEN</option>
+                <For each={airplanes}>{airplane =>
+                  <option value={airplane.registration}>{airplane.registration} - {airplane.model} </option>
+                }
+                </For>
               </select>
             </fieldset>
             <fieldset class="fieldset">

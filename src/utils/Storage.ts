@@ -37,8 +37,11 @@ export type THeadingStore = {
   to: string,
   frequency: string,
   trueCourse: number,
+  windCorrectionAngle: number,
   trueHeading: number,
+  variation: number,
   magneticHeading: number,
+  deviation: number,
   heading: number,
 
   airSpeed: number,
