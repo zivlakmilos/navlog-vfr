@@ -1,6 +1,28 @@
-import { PDFDocument, PDFPage } from "pdf-lib";
+import { PDFDocument, PDFPage, rgb } from "pdf-lib";
 import { TGeneralStore, THeadingStore, TWeatherStore } from "./Storage";
 import { TAirplane } from "./Data";
+
+const intToStr = (num: number, padding?: number, sign?: boolean): string => {
+  let res = num.toString();
+  if (padding) {
+    res = res.padStart(padding, '0');
+  }
+
+  if (sign && num >= 0) {
+    res = '+' + res;
+  }
+
+  return res;
+}
+
+const floatToStr = (num: number, decimalPlaces: number): string => {
+  let res = num.toFixed(decimalPlaces);
+  return res;
+}
+
+const timeToStr = (time: number): string => {
+  return intToStr(Math.floor(time / 60), 2) + ":" + intToStr(time % 60, 2);
+}
 
 const printHeader = (pdf: PDFPage, generalInfo: TGeneralStore, airplane: TAirplane) => {
   pdf.moveTo(360, 545);
@@ -29,6 +51,116 @@ const printHeader = (pdf: PDFPage, generalInfo: TGeneralStore, airplane: TAirpla
   });
 }
 
+const printHeadings = (pdf: PDFPage, generalInfo: TGeneralStore, headings: THeadingStore[]) => {
+  const heightDif = 29;
+
+  for (let i = 0; i < headings.length; i++) {
+    const heading = headings[i];
+    const height = heightDif * i;
+
+    pdf.moveTo(45, 407 - height);
+    pdf.drawText(heading.from, {
+      size: 12,
+    });
+
+    if (i == headings.length - 1) {
+      pdf.moveTo(45, 407 - height - heightDif);
+      pdf.drawText(heading.to, {
+        size: 12,
+      });
+    }
+
+    pdf.moveTo(114, 403 - height);
+    pdf.drawText(heading.frequency, {
+      size: 8,
+    });
+
+    if (i < headings.length - 1) {
+      pdf.moveTo(114, 390 - height);
+      pdf.drawText(heading.frequency, {
+        size: 8,
+      });
+    }
+
+    pdf.moveTo(150, 403 - height);
+    pdf.drawText(intToStr(heading.trueCourse, 3), {
+      size: 8,
+    });
+    pdf.moveTo(150, 390 - height);
+    pdf.drawText(intToStr(heading.windCorrectionAngle, 0, true), {
+      size: 8,
+    });
+
+    pdf.moveTo(177, 403 - height);
+    pdf.drawText(intToStr(heading.trueHeading, 3), {
+      size: 8,
+    });
+    pdf.moveTo(177, 390 - height);
+    pdf.drawText(intToStr(heading.variation, 0, true), {
+      size: 8,
+    });
+
+    pdf.moveTo(205, 403 - height);
+    pdf.drawText(intToStr(heading.magneticHeading, 3), {
+      size: 8,
+    });
+    pdf.moveTo(205, 390 - height);
+    pdf.drawText(intToStr(heading.deviation, 0, true), {
+      size: 8,
+    });
+
+    pdf.moveTo(230, 395 - height);
+    pdf.drawText(intToStr(heading.heading, 3), {
+      size: 12,
+      color: rgb(1, 0, 0),
+    });
+
+    pdf.moveTo(285, 403 - height);
+    pdf.drawText(intToStr(heading.airSpeed), {
+      size: 8,
+    });
+    pdf.moveTo(285, 390 - height);
+    pdf.drawText(intToStr(heading.groudSpeed), {
+      size: 8,
+    });
+
+    pdf.moveTo(310, 403 - height);
+    pdf.drawText(floatToStr(heading.fuelLeg, 2), {
+      size: 8,
+    });
+    pdf.moveTo(310, 390 - height);
+    pdf.drawText(floatToStr(heading.fuelRem, 2), {
+      size: 8,
+      color: rgb(1, 0, 0),
+    });
+
+    pdf.moveTo(337, 403 - height);
+    pdf.drawText(floatToStr(heading.distLeg, 2), {
+      size: 8,
+    });
+    pdf.moveTo(337, 390 - height);
+    pdf.drawText(floatToStr(heading.distRem, 2), {
+      size: 8,
+    });
+
+    pdf.moveTo(365, 403 - height);
+    pdf.drawText(timeToStr(heading.ete), {
+      size: 8,
+    });
+    pdf.moveTo(365, 390 - height);
+    pdf.drawText(timeToStr(heading.corr), {
+      size: 8,
+      color: rgb(1, 0, 0),
+    });
+
+    pdf.moveTo(392, 403 - height);
+    pdf.drawText(timeToStr(heading.eta), {
+      size: 8,
+      color: rgb(1, 0, 0),
+    });
+  }
+}
+
 export const printNavLog = async (generalInfo: TGeneralStore, headings: THeadingStore[], weather: TWeatherStore, airplane: TAirplane): Promise<Uint8Array> => {
   const url = "/documents/navlog.pdf";
   const existingPdfBytes = await fetch(url).then(res => res.arrayBuffer())
@@ -37,6 +169,7 @@ export const printNavLog = async (generalInfo: TGeneralStore, headings: THeading
   const page = pdf.getPage(0);
 
   printHeader(page, generalInfo, airplane);
+  printHeadings(page, generalInfo, headings);
 
   return pdf.save();
 }

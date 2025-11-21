@@ -10,7 +10,7 @@ const calculateGroundSpeed = (trueCourse: number, airSpeed: number, windDir: num
 }
 
 export const calculateHeading = (heading: THeadingStore, weather: TWeatherStore, airplane: TAirplane): THeadingStore => {
-  const res: THeadingStore = { ...heading };
+  const res: THeadingStore = heading;
 
   const wca = Math.round(calculateWindCorrectionAngle(res.trueCourse, res.airSpeed, weather.windDirection, weather.windSpeed));
   res.windCorrectionAngle = wca;

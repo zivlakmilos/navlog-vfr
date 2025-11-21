@@ -53,8 +53,8 @@ export type THeadingStore = {
 
   ete: number,
   corr: number,
-  eta: string,
-  ata: string,
+  eta: number,
+  ata: number,
 }
 
 export const headingStore = createStore<THeadingStore[]>([]);

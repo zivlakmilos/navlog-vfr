@@ -39,8 +39,8 @@ const Heading: Component = () => {
 
       ete: 0,
       corr: 0,
-      eta: "",
-      ata: "",
+      eta: 0,
+      ata: 0,
     }]);
     setId(newId);
   }
