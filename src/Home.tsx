@@ -2,6 +2,7 @@ import { createEffect, createSignal, For, type Component } from 'solid-js';
 import { generalStore, headingStore, TGeneralStore, weatherStore } from './utils/Storage';
 import { A } from '@solidjs/router';
 import { airplanes, TAirplane } from './utils/Data';
+import { downloadFile, printNavLog } from './utils/Print';
 
 // Get wind: https://aviationweather.gov/api/data/metar?ids=LYBE&format=json
 
@@ -29,6 +30,15 @@ const Home: Component = () => {
       prev.airplane = value;
       return prev;
     });
+  }
+
+  const onPrintClicked = async () => {
+    const bytes = await printNavLog(generalInfo(), heading, weatherInfo(), airplanes[0]); // TODO: load airplane
+    // downloadFile(bytes, "navlog.pdf", "application/pdf");
+
+    const blob = new Blob([bytes] as BlobPart[], { type: "application/pdf" });
+    const fileURL = URL.createObjectURL(blob);
+    window.open(fileURL, '_blank');
   }
 
   return (
@@ -134,6 +144,7 @@ const Home: Component = () => {
         <input type="checkbox" name="card-general-info" checked="checked" />
         <div class="collapse-title font-semibold">Repport</div>
         <div class="collapse-content text-sm">
+          <button class="btn btn-primary" type="button" onClick={onPrintClicked}>Print</button>
         </div>
       </div>
     </div >
