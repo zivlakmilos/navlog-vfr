@@ -13,7 +13,33 @@ export const airplanes: TAirplane[] = [
     fuelPerH: 17,
     maxFuel: 74,
     deviationCalc: function (heading: number): number {
-      return 0; // TODO: implement deviation calc
+      const table = {
+        0: -2,
+        30: -1,
+        60: -1,
+        90: 0,
+        120: -1,
+        150: 1,
+        180: -1,
+        210: -1,
+        240: -1,
+        270: -1,
+        300: -2,
+        330: -1,
+        360: -2,
+      };
+
+      let res = 0;
+      let minDiff = 9999;
+      for (const key in table) {
+        const forHeding = +key;
+        const diff = Math.abs(forHeding - heading);
+        if (diff < minDiff) {
+          res = table[key];
+        }
+      }
+
+      return res;
     }
   },
 ];
