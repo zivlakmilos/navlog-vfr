@@ -75,12 +75,10 @@ const printHeadings = (pdf: PDFPage, generalInfo: TGeneralStore, headings: THead
       size: 8,
     });
 
-    if (i < headings.length - 1) {
-      pdf.moveTo(114, 390 - height);
-      pdf.drawText(heading.frequency, {
-        size: 8,
-      });
-    }
+    pdf.moveTo(114, 390 - height);
+    pdf.drawText(heading.frequency, {
+      size: 8,
+    });
 
     pdf.moveTo(150, 403 - height);
     pdf.drawText(intToStr(heading.trueCourse, 3), {

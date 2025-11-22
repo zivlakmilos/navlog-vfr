@@ -3,6 +3,7 @@ import { generalStore, headingStore, TGeneralStore, weatherStore } from './utils
 import { A } from '@solidjs/router';
 import { airplanes, TAirplane } from './utils/Data';
 import { downloadFile, printNavLog } from './utils/Print';
+import { calculateAll } from './utils/Calculations';
 
 // Get wind: https://aviationweather.gov/api/data/metar?ids=LYBE&format=json
 
@@ -33,10 +34,10 @@ const Home: Component = () => {
   }
 
   const onPrintClicked = async () => {
+    calculateAll(generalInfo(), heading, weatherInfo(), airplanes[0]);
     const bytes = await printNavLog(generalInfo(), heading, weatherInfo(), airplanes[0]); // TODO: load airplane
     // downloadFile(bytes, "navlog.pdf", "application/pdf");
 
-    console.log(heading);
     const blob = new Blob([bytes] as BlobPart[], { type: "application/pdf" });
     const fileURL = URL.createObjectURL(blob);
     window.open(fileURL, '_blank');

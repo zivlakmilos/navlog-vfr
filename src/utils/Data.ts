@@ -32,10 +32,11 @@ export const airplanes: TAirplane[] = [
       let res = 0;
       let minDiff = 9999;
       for (const key in table) {
-        const forHeding = +key;
-        const diff = Math.abs(forHeding - heading);
+        const forHeading = +key;
+        const diff = Math.abs(forHeading - heading);
         if (diff < minDiff) {
           res = table[key];
+          minDiff = diff;
         }
       }
 

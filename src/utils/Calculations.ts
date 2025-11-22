@@ -1,5 +1,5 @@
 import { TAirplane } from "./Data";
-import { THeadingStore, TWeatherStore } from "./Storage"
+import { TGeneralStore, THeadingStore, TWeatherStore } from "./Storage"
 
 const calculateWindCorrectionAngle = (trueCourse: number, airSpeed: number, windDir: number, windSpeed: number): number => {
   return (180 / Math.PI) * Math.asin((windSpeed / airSpeed) * Math.sin((Math.PI * (windDir - trueCourse)) / 180));
@@ -7,6 +7,20 @@ const calculateWindCorrectionAngle = (trueCourse: number, airSpeed: number, wind
 
 const calculateGroundSpeed = (trueCourse: number, airSpeed: number, windDir: number, windSpeed: number, windCorrevctionAngle: number): number => {
   return Math.sqrt(Math.pow(airSpeed, 2) + Math.pow(windSpeed, 2) - 2 * airSpeed * windSpeed * Math.cos((Math.PI * (trueCourse - windDir + windCorrevctionAngle)) / 180));
+}
+
+const timeStrToInt = (str: string): number => {
+  let res = 0;
+
+  const timeSplit = str.split(":");
+  if (timeSplit.length >= 1) {
+    res += +timeSplit[timeSplit.length - 1];
+    if (timeSplit.length >= 2) {
+      res += +timeSplit[timeSplit.length - 2] * 60;
+    }
+  }
+
+  return res;
 }
 
 export const calculateHeading = (heading: THeadingStore, weather: TWeatherStore, airplane: TAirplane): THeadingStore => {
@@ -28,12 +42,18 @@ export const calculateHeading = (heading: THeadingStore, weather: TWeatherStore,
   return res
 }
 
-export const calculateAll = (headings: THeadingStore[], weather: TWeatherStore, airplane: TAirplane): THeadingStore[] => {
+export const calculateAll = (generalInfo: TGeneralStore, headings: THeadingStore[], weather: TWeatherStore, airplane: TAirplane): THeadingStore[] => {
   let totalDistance = 0;
   let totalFuel = airplane.maxFuel;
 
+  let currTime = timeStrToInt(generalInfo.time);
+
   for (let i = 0; i < headings.length; i++) {
     headings[i] = calculateHeading(headings[i], weather, airplane);
+    totalDistance += headings[i].distLeg;
+
+    currTime += headings[i].ete;
+    headings[i].eta = currTime;
   }
 
   for (let i = 0; i < headings.length; i++) {

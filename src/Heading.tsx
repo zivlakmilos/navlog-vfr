@@ -54,7 +54,7 @@ const Heading: Component = () => {
     if (!airplane) {
       airplane = airplanes[0];
     }
-    setHeading(heading => calculateAll(heading, weather(), airplane));
+    setHeading(heading => calculateAll(generalInfo(), heading, weather(), airplane));
     navigate("/", { replace: true });
   }
 
