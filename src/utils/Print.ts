@@ -311,23 +311,3 @@ export const printNavLog = async (generalInfo: TGeneralStore, headings: THeading
 
   return pdf.save();
 }
-
-export const downloadFile = (data: Uint8Array, filename: string, type: string) => {
-  const blob = new Blob([data] as BlobPart[], { type: type });
-
-  const url = URL.createObjectURL(blob);
-
-  const link = document.createElement('a');
-  link.style.display = 'none';
-  link.href = url;
-  link.download = filename;
-
-  document.body.appendChild(link);
-  link.click();
-
-  setTimeout(() => {
-    URL.revokeObjectURL(url);
-    document.body.removeChild(link);
-  }, 0);
-}
-

@@ -4,6 +4,7 @@ import { A } from '@solidjs/router';
 import { airplanes, airports, TAirplane } from './utils/Data';
 import { downloadFile, printNavLog } from './utils/Print';
 import { calculateAll } from './utils/Calculations';
+import { saveNavLog } from './utils/File';
 
 // Get wind: https://aviationweather.gov/api/data/metar?ids=LYBE&format=json
 
@@ -49,6 +50,13 @@ const Home: Component = () => {
     });
   }
 
+  const onLoadClicked = () => {
+  }
+
+  const onSaveClicked = () => {
+    saveNavLog(generalInfo(), weatherInfo(), heading);
+  }
+
   const onPrintClicked = async () => {
     const airplane = airplanes.find(a => a.registration === generalInfo().airplane);
     if (!airplane) {
@@ -71,6 +79,13 @@ const Home: Component = () => {
         <div class="collapse-title font-semibold">General Info</div>
         <div class="collapse-content text-sm">
           <form class="w-full">
+            <button class="btn btn-primary" type="button" onClick={onLoadClicked}>Load</button>
+            &nbsp;&nbsp;&nbsp;
+            <button class="btn btn-primary" type="button" onClick={onSaveClicked}>Save</button>
+            &nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;&nbsp;
+            <button class="btn btn-primary" type="button">Import from LittleNavMap</button>
             <fieldset class="fieldset">
               <legend class="fieldset-legend">Airplane:</legend>
               <select class="select" onChange={e => onAirplaneChanged(e.target.value)}>
