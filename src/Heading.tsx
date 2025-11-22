@@ -25,10 +25,11 @@ const Heading: Component = () => {
       trueCourse: 0,
       windCorrectionAngle: 0,
       trueHeading: 0,
-      variation: 0,
+      variation: newId === 0 ? -5.5 : heading[newId - 1].variation,
       magneticHeading: 0,
       deviation: 0,
       heading: 0,
+      altitude: newId === 0 ? 1500 : heading[newId - 1].altitude,
 
       airSpeed: 0,
       groudSpeed: 0,
@@ -80,6 +81,14 @@ const Heading: Component = () => {
             <fieldset class="fieldset">
               <legend class="fieldset-legend">True Course:</legend>
               <input type="text" class="input" value={heading[id()].trueCourse} onInput={e => updateHeading("trueCourse", +e.target.value)} />
+            </fieldset>
+            <fieldset class="fieldset">
+              <legend class="fieldset-legend">Deviation:</legend>
+              <input type="text" class="input" value={heading[id()].variation} onInput={e => updateHeading("variation", +e.target.value)} />
+            </fieldset>
+            <fieldset class="fieldset">
+              <legend class="fieldset-legend">Altitude:</legend>
+              <input type="text" class="input" value={heading[id()].altitude} onInput={e => updateHeading("altitude", +e.target.value)} />
             </fieldset>
             <fieldset class="fieldset">
               <legend class="fieldset-legend">Air Speed:</legend>

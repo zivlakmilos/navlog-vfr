@@ -43,6 +43,7 @@ export type THeadingStore = {
   magneticHeading: number,
   deviation: number,
   heading: number,
+  altitude: number,
 
   airSpeed: number,
   groudSpeed: number,

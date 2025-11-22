@@ -117,6 +117,12 @@ const printHeadings = (pdf: PDFPage, generalInfo: TGeneralStore, headings: THead
       color: rgb(1, 0, 0),
     });
 
+    pdf.moveTo(255, 395 - height);
+    pdf.drawText(intToStr(heading.altitude, 3), {
+      size: 9,
+      color: rgb(1, 0, 0),
+    });
+
     pdf.moveTo(285, 403 - height);
     pdf.drawText(intToStr(heading.airSpeed), {
       size: 8,
