@@ -47,19 +47,19 @@ export const airplanes: TAirplane[] = [
 
 export type TAirport = {
   code: string,
-  frequency: number,
+  frequency: string,
   elevation: number,
 };
 
 export const airports: TAirport[] = [
   {
     code: "LYNS",
-    frequency: 123.500,
+    frequency: "123.500",
     elevation: 261,
   },
   {
     code: "LYZR",
-    frequency: 130.400,
+    frequency: "130.400",
     elevation: 264,
   },
 ];

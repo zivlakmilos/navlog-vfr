@@ -2,7 +2,7 @@ import { A, useNavigate, useParams } from '@solidjs/router';
 import { createSignal, type Component } from 'solid-js';
 import { generalStore, headingStore, weatherStore, type THeadingStore } from './utils/Storage';
 import { calculateAll } from './utils/Calculations';
-import { airplanes } from './utils/Data';
+import { airplanes, airports } from './utils/Data';
 
 const Heading: Component = () => {
   const [generalInfo] = generalStore;
@@ -17,19 +17,19 @@ const Heading: Component = () => {
 
   if (isNew) {
     const newId = heading.length;
-    setHeading([...heading, {
+    const newHeading: THeadingStore = {
       id: newId,
-      from: newId === 0 ? generalInfo().departure : heading[newId - 1].to,
+      from: "",
       to: "",
-      frequency: newId === 0 ? "123.500" : heading[newId - 1].frequency,
+      frequency: "123.500",
       trueCourse: 0,
       windCorrectionAngle: 0,
       trueHeading: 0,
-      variation: newId === 0 ? -5.5 : heading[newId - 1].variation,
+      variation: -5.5,
       magneticHeading: 0,
       deviation: 0,
       heading: 0,
-      altitude: newId === 0 ? 1500 : heading[newId - 1].altitude,
+      altitude: 1500,
 
       airSpeed: 0,
       groudSpeed: 0,
@@ -42,7 +42,24 @@ const Heading: Component = () => {
       corr: 0,
       eta: 0,
       ata: 0,
-    }]);
+    };
+
+    if (newId === 0) {
+      newHeading.from = generalInfo().departure;
+
+      const airport = airports.find(a => a.code === generalInfo().departure);
+      if (airport) {
+        newHeading.frequency = airport.frequency;
+        newHeading.altitude = Math.ceil((airport.elevation + 1000) / 500) * 500;
+      }
+    } else {
+      newHeading.from = heading[newId - 1].to;
+      newHeading.frequency = heading[newId - 1].frequency;
+      newHeading.variation = heading[newId - 1].variation;
+      newHeading.altitude = heading[newId - 1].altitude;
+    }
+
+    setHeading([...heading, newHeading]);
     setId(newId);
   }
 

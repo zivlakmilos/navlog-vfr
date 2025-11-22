@@ -1,7 +1,7 @@
 import { createEffect, createSignal, For, type Component } from 'solid-js';
 import { generalStore, headingStore, TGeneralStore, weatherStore } from './utils/Storage';
 import { A } from '@solidjs/router';
-import { airplanes, TAirplane } from './utils/Data';
+import { airplanes, airports, TAirplane } from './utils/Data';
 import { downloadFile, printNavLog } from './utils/Print';
 import { calculateAll } from './utils/Calculations';
 
@@ -37,6 +37,18 @@ const Home: Component = () => {
     });
   }
 
+  const updateAlternativeAirport = (idx: number, val: string) => {
+    setGeneralInfo(prev => {
+      const key = `alternate${idx}`;
+      prev[key] = val;
+      const airport = airports.find(a => a.code === val);
+      if (airport) {
+        prev[`alternate${idx}Frequency`] = airport.frequency;
+      }
+      return prev;
+    });
+  }
+
   const onPrintClicked = async () => {
     const airplane = airplanes.find(a => a.registration === generalInfo().airplane);
     if (!airplane) {
@@ -44,7 +56,7 @@ const Home: Component = () => {
     }
 
     calculateAll(generalInfo(), heading, weatherInfo(), airplane);
-    const bytes = await printNavLog(generalInfo(), heading, weatherInfo(), airplane); // TODO: load airplane
+    const bytes = await printNavLog(generalInfo(), heading, weatherInfo(), airplane);
     // downloadFile(bytes, "navlog.pdf", "application/pdf");
 
     const blob = new Blob([bytes] as BlobPart[], { type: "application/pdf" });
@@ -75,7 +87,7 @@ const Home: Component = () => {
             </fieldset>
             <fieldset class="fieldset">
               <legend class="fieldset-legend">Destination:</legend>
-              <input type="text" class="input" value={generalInfo().departure} onInput={e => updateGeneralInfo("destination", e.target.value)} />
+              <input type="text" class="input" value={generalInfo().destination} onInput={e => updateGeneralInfo("destination", e.target.value)} />
             </fieldset>
             <fieldset class="fieldset">
               <legend class="fieldset-legend">Date:</legend>
@@ -93,7 +105,7 @@ const Home: Component = () => {
         </div>
       </div>
       <div class="collapse collapse-arrow bg-base-100 border border-base-300 m-5">
-        <input type="checkbox" name="card-general-info" checked="checked" />
+        <input type="checkbox" name="card-general-info" />
         <div class="collapse-title font-semibold">Weather</div>
         <div class="collapse-content text-sm">
           <form class="w-full">
@@ -153,6 +165,38 @@ const Home: Component = () => {
             </table>
             <A class="btn btn-primary mt-5" href="/heading/new">New Heading</A>
           </div>
+        </div>
+      </div>
+      <div class="collapse collapse-arrow bg-base-100 border border-base-300 m-5">
+        <input type="checkbox" name="card-general-info" />
+        <div class="collapse-title font-semibold">Alternate</div>
+        <div class="collapse-content text-sm">
+          <form class="w-full">
+            <fieldset class="fieldset">
+              <legend class="fieldset-legend">Alternate 1:</legend>
+              <input type="text" class="input" value={generalInfo().alternate1} onInput={e => updateAlternativeAirport(1, e.target.value)} />
+            </fieldset>
+            <fieldset class="fieldset">
+              <legend class="fieldset-legend">Alternate 1 Frequency:</legend>
+              <input type="text" class="input" value={generalInfo().alternate1Frequency} onInput={e => updateGeneralInfo("alternate1Frequency", e.target.value)} />
+            </fieldset>
+            <fieldset class="fieldset">
+              <legend class="fieldset-legend">Alternate 2:</legend>
+              <input type="text" class="input" value={generalInfo().alternate2} onInput={e => updateAlternativeAirport(2, e.target.value)} />
+            </fieldset>
+            <fieldset class="fieldset">
+              <legend class="fieldset-legend">Alternate 2 Frequency:</legend>
+              <input type="text" class="input" value={generalInfo().alternate2Frequency} onInput={e => updateGeneralInfo("alternate2Frequency", e.target.value)} />
+            </fieldset>
+            <fieldset class="fieldset">
+              <legend class="fieldset-legend">Alternate 3:</legend>
+              <input type="text" class="input" value={generalInfo().alternate3} onInput={e => updateAlternativeAirport(3, e.target.value)} />
+            </fieldset>
+            <fieldset class="fieldset">
+              <legend class="fieldset-legend">Alternate 3 Frequency:</legend>
+              <input type="text" class="input" value={generalInfo().alternate3Frequency} onInput={e => updateGeneralInfo("alternate3Frequency", e.target.value)} />
+            </fieldset>
+          </form>
         </div>
       </div>
       <div class="collapse collapse-arrow bg-base-100 border border-base-300 m-5">

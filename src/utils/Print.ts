@@ -268,6 +268,35 @@ const printTotals = (pdf: PDFPage, generalInfo: TGeneralStore, headings: THeadin
   });
 }
 
+const printAlternativeAirports = (pdf: PDFPage, generalInfo: TGeneralStore) => {
+  pdf.moveTo(180, 92);
+  pdf.drawText(generalInfo.alternate1, {
+    size: 8,
+  });
+  pdf.moveTo(230, 92);
+  pdf.drawText(generalInfo.alternate1Frequency, {
+    size: 8,
+  });
+
+  pdf.moveTo(180, 80);
+  pdf.drawText(generalInfo.alternate2, {
+    size: 8,
+  });
+  pdf.moveTo(230, 80);
+  pdf.drawText(generalInfo.alternate2Frequency, {
+    size: 8,
+  });
+
+  pdf.moveTo(180, 68);
+  pdf.drawText(generalInfo.alternate3, {
+    size: 8,
+  });
+  pdf.moveTo(230, 68);
+  pdf.drawText(generalInfo.alternate3Frequency, {
+    size: 8,
+  });
+}
+
 export const printNavLog = async (generalInfo: TGeneralStore, headings: THeadingStore[], weather: TWeatherStore, airplane: TAirplane): Promise<Uint8Array> => {
   const url = "/documents/navlog.pdf";
   const existingPdfBytes = await fetch(url).then(res => res.arrayBuffer())
@@ -278,6 +307,7 @@ export const printNavLog = async (generalInfo: TGeneralStore, headings: THeading
   printHeader(page, generalInfo, airplane);
   printHeadings(page, generalInfo, headings);
   printTotals(page, generalInfo, headings, airplane);
+  printAlternativeAirports(page, generalInfo);
 
   return pdf.save();
 }
