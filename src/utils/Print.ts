@@ -54,6 +54,10 @@ const printHeader = (pdf: PDFPage, generalInfo: TGeneralStore, airplane: TAirpla
 const printHeadings = (pdf: PDFPage, generalInfo: TGeneralStore, headings: THeadingStore[]) => {
   const heightDif = 29;
 
+  let totalFuel = 0;
+  let totalDist = 0;
+  let totalTime = 0;
+
   for (let i = 0; i < headings.length; i++) {
     const heading = headings[i];
     const height = heightDif * i;
@@ -156,7 +160,106 @@ const printHeadings = (pdf: PDFPage, generalInfo: TGeneralStore, headings: THead
       size: 8,
       color: rgb(1, 0, 0),
     });
+
+    totalFuel += heading.fuelLeg;
+    totalDist += heading.distLeg;
+    totalTime += heading.corr;
   }
+}
+
+const printTotals = (pdf: PDFPage, headings: THeadingStore[], airplane: TAirplane) => {
+  let totalFuel = 0;
+  let totalDist = 0;
+  let totalTime = 0;
+
+  for (let i = 0; i < headings.length; i++) {
+    const heading = headings[i];
+    totalFuel += heading.fuelLeg;
+    totalDist += heading.distLeg;
+    totalTime += heading.corr;
+  }
+
+  const contiquency = totalFuel * 5 / 100;
+  const fuel45min = airplane.fuelPerH / 60 * 45;
+  const required = totalFuel + 2 * fuel45min + contiquency;
+  const loaded = airplane.maxFuel;// TODO: add input field for this instead of usinx airplane max hardcoded
+  const extraFuel = loaded - required;
+
+  pdf.moveTo(310, 130);
+  pdf.drawText(floatToStr(totalFuel, 2), {
+    size: 8,
+  });
+  pdf.moveTo(337, 130);
+  pdf.drawText(floatToStr(totalDist, 2), {
+    size: 8,
+  });
+  pdf.moveTo(365, 130);
+  pdf.drawText(timeToStr(totalTime), {
+    size: 8,
+  });
+
+  pdf.moveTo(115, 103);
+  pdf.drawText(floatToStr(totalFuel, 2), {
+    size: 8,
+  });
+  pdf.moveTo(147, 103);
+  pdf.drawText(timeToStr(Math.ceil(totalFuel / (airplane.fuelPerH / 60))), {
+    size: 8,
+  });
+
+  pdf.moveTo(115, 92);
+  pdf.drawText(floatToStr(fuel45min, 2), {
+    size: 8,
+  });
+  pdf.moveTo(147, 92);
+  pdf.drawText(timeToStr(45), {
+    size: 8,
+  });
+
+  pdf.moveTo(115, 80);
+  pdf.drawText(floatToStr(fuel45min, 2), {
+    size: 8,
+  });
+  pdf.moveTo(147, 80);
+  pdf.drawText(timeToStr(45), {
+    size: 8,
+  });
+
+  pdf.moveTo(115, 68);
+  pdf.drawText(floatToStr(contiquency, 2), {
+    size: 8,
+  });
+  pdf.moveTo(147, 68);
+  pdf.drawText(timeToStr(Math.ceil(contiquency / (airplane.fuelPerH / 60))), {
+    size: 8,
+  });
+
+  pdf.moveTo(115, 55);
+  pdf.drawText(floatToStr(required, 2), {
+    size: 8,
+  });
+  pdf.moveTo(147, 55);
+  pdf.drawText(timeToStr(Math.ceil(required / (airplane.fuelPerH / 60))), {
+    size: 8,
+  });
+
+  pdf.moveTo(115, 43);
+  pdf.drawText(floatToStr(loaded, 2), {
+    size: 8,
+  });
+  pdf.moveTo(147, 43);
+  pdf.drawText(timeToStr(Math.ceil(loaded / (airplane.fuelPerH / 60))), {
+    size: 8,
+  });
+
+  pdf.moveTo(115, 31);
+  pdf.drawText(floatToStr(extraFuel, 2), {
+    size: 8,
+  });
+  pdf.moveTo(147, 31);
+  pdf.drawText(timeToStr(Math.ceil(extraFuel / (airplane.fuelPerH / 60))), {
+    size: 8,
+  });
 }
 
 export const printNavLog = async (generalInfo: TGeneralStore, headings: THeadingStore[], weather: TWeatherStore, airplane: TAirplane): Promise<Uint8Array> => {
@@ -168,6 +271,7 @@ export const printNavLog = async (generalInfo: TGeneralStore, headings: THeading
 
   printHeader(page, generalInfo, airplane);
   printHeadings(page, generalInfo, headings);
+  printTotals(page, headings, airplane);
 
   return pdf.save();
 }
