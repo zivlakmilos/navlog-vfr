@@ -7,6 +7,7 @@ export type TGeneralStore = {
   destination: string,
   date: string,
   time: string,
+  loadedFuel: number,
 }
 
 export const generalStore = createSignal<TGeneralStore>({
@@ -15,6 +16,7 @@ export const generalStore = createSignal<TGeneralStore>({
   destination: "LYNS",
   date: (new Date()).toISOString().split('T')[0],
   time: "12:00",
+  loadedFuel: 74,
 }, { equals: false });
 
 export type TWeatherStore = {

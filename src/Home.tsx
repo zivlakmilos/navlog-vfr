@@ -27,15 +27,24 @@ const Home: Component = () => {
   }
 
   const onAirplaneChanged = (value: string) => {
+    const airplane = airplanes.find(a => a.registration === value);
     setGeneralInfo(prev => {
       prev.airplane = value;
+      if (airplane) {
+        prev.loadedFuel = airplane.maxFuel;
+      }
       return prev;
     });
   }
 
   const onPrintClicked = async () => {
-    calculateAll(generalInfo(), heading, weatherInfo(), airplanes[0]);
-    const bytes = await printNavLog(generalInfo(), heading, weatherInfo(), airplanes[0]); // TODO: load airplane
+    const airplane = airplanes.find(a => a.registration === generalInfo().airplane);
+    if (!airplane) {
+      alert("Airplane not selected!");
+    }
+
+    calculateAll(generalInfo(), heading, weatherInfo(), airplane);
+    const bytes = await printNavLog(generalInfo(), heading, weatherInfo(), airplane); // TODO: load airplane
     // downloadFile(bytes, "navlog.pdf", "application/pdf");
 
     const blob = new Blob([bytes] as BlobPart[], { type: "application/pdf" });
@@ -55,7 +64,7 @@ const Home: Component = () => {
               <select class="select" onChange={e => onAirplaneChanged(e.target.value)}>
                 <option disabled selected>Airplane</option>
                 <For each={airplanes}>{airplane =>
-                  <option value={airplane.registration}>{airplane.registration} - {airplane.model} </option>
+                  <option value={airplane.registration} selected={airplane.registration === generalInfo().airplane}>{airplane.registration} - {airplane.model}</option>
                 }
                 </For>
               </select>
@@ -75,6 +84,10 @@ const Home: Component = () => {
             <fieldset class="fieldset">
               <legend class="fieldset-legend">Time:</legend>
               <input type="time" class="input" value={generalInfo().time} onInput={e => updateGeneralInfo("time", e.target.value)} />
+            </fieldset>
+            <fieldset class="fieldset">
+              <legend class="fieldset-legend">Loaded Fuel:</legend>
+              <input type="text" class="input" value={generalInfo().loadedFuel} onInput={e => updateGeneralInfo("loadedFuel", +e.target.value)} />
             </fieldset>
           </form>
         </div>

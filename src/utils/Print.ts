@@ -173,7 +173,7 @@ const printHeadings = (pdf: PDFPage, generalInfo: TGeneralStore, headings: THead
   }
 }
 
-const printTotals = (pdf: PDFPage, headings: THeadingStore[], airplane: TAirplane) => {
+const printTotals = (pdf: PDFPage, generalInfo: TGeneralStore, headings: THeadingStore[], airplane: TAirplane) => {
   let totalFuel = 0;
   let totalDist = 0;
   let totalTime = 0;
@@ -188,7 +188,7 @@ const printTotals = (pdf: PDFPage, headings: THeadingStore[], airplane: TAirplan
   const contiquency = totalFuel * 5 / 100;
   const fuel45min = airplane.fuelPerH / 60 * 45;
   const required = totalFuel + 2 * fuel45min + contiquency;
-  const loaded = airplane.maxFuel;// TODO: add input field for this instead of usinx airplane max hardcoded
+  const loaded = generalInfo.loadedFuel;
   const extraFuel = loaded - required;
 
   pdf.moveTo(310, 130);
@@ -277,7 +277,7 @@ export const printNavLog = async (generalInfo: TGeneralStore, headings: THeading
 
   printHeader(page, generalInfo, airplane);
   printHeadings(page, generalInfo, headings);
-  printTotals(page, headings, airplane);
+  printTotals(page, generalInfo, headings, airplane);
 
   return pdf.save();
 }

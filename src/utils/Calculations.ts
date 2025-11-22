@@ -44,7 +44,7 @@ export const calculateHeading = (heading: THeadingStore, weather: TWeatherStore,
 
 export const calculateAll = (generalInfo: TGeneralStore, headings: THeadingStore[], weather: TWeatherStore, airplane: TAirplane): THeadingStore[] => {
   let totalDistance = 0;
-  let totalFuel = airplane.maxFuel;
+  let totalFuel = generalInfo.loadedFuel;
 
   let currTime = timeStrToInt(generalInfo.time);
 
