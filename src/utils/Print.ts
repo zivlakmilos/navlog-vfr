@@ -297,6 +297,18 @@ const printAlternativeAirports = (pdf: PDFPage, generalInfo: TGeneralStore) => {
   });
 }
 
+const printWeather = (pdf: PDFPage, weather: TWeatherStore) => {
+  pdf.moveTo(40, 585);
+  pdf.drawText(weather.metar, {
+    size: 7,
+  });
+
+  pdf.moveTo(40, 575);
+  pdf.drawText(weather.taf, {
+    size: 7,
+  });
+}
+
 export const printNavLog = async (generalInfo: TGeneralStore, headings: THeadingStore[], weather: TWeatherStore, airplane: TAirplane): Promise<Uint8Array> => {
   const url = "/documents/navlog.pdf";
   const existingPdfBytes = await fetch(url).then(res => res.arrayBuffer())
@@ -308,6 +320,7 @@ export const printNavLog = async (generalInfo: TGeneralStore, headings: THeading
   printHeadings(page, generalInfo, headings);
   printTotals(page, generalInfo, headings, airplane);
   printAlternativeAirports(page, generalInfo);
+  printWeather(page, weather);
 
   return pdf.save();
 }

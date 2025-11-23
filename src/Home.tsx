@@ -141,11 +141,11 @@ const Home: Component = () => {
           <form class="w-full">
             <fieldset class="fieldset">
               <legend class="fieldset-legend">METAR:</legend>
-              <input type="text" class="input w-full" readonly="readonly" />
+              <input type="text" class="input w-full" value={weatherInfo().metar} onInput={e => updateWeatherInfo("metar", e.target.value)} />
             </fieldset>
             <fieldset class="fieldset">
               <legend class="fieldset-legend">TAF:</legend>
-              <input type="text" class="input w-full" readonly="readonly" />
+              <input type="text" class="input w-full" value={weatherInfo().taf} onInput={e => updateWeatherInfo("taf", e.target.value)} />
             </fieldset>
             <fieldset class="fieldset">
               <legend class="fieldset-legend">Wind Direction:</legend>
