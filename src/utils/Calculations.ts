@@ -46,7 +46,7 @@ export const calculateHeading = (heading: THeadingStore, weather: TWeatherStore,
   res.windCorrectionAngle = wca;
   res.trueHeading = roundHeading(res.trueCourse + wca);
   res.magneticHeading = roundHeading(res.trueHeading + res.variation);
-  res.deviation = roundHeading(airplane.deviationCalc(res.magneticHeading));
+  res.deviation = airplane.deviationCalc(res.magneticHeading);
   res.heading = roundHeading(res.magneticHeading + res.deviation);
 
   res.groudSpeed = Math.round(calculateGroundSpeed(res.trueCourse, res.airSpeed, weather.windDirection, weather.windSpeed, wca));
@@ -76,7 +76,7 @@ export const calculateAll = (generalInfo: TGeneralStore, headings: THeadingStore
     totalDistance -= headings[i].distLeg;
     totalFuel -= headings[i].fuelLeg;
 
-    headings[i].distRem = totalDistance;
+    headings[i].distRem = Math.abs(totalDistance);
     headings[i].fuelRem = totalFuel;
   }
 
