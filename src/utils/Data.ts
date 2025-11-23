@@ -62,4 +62,14 @@ export const airports: TAirport[] = [
     frequency: "130.400",
     elevation: 264,
   },
+  {
+    code: "LYSU",
+    frequency: "123.500",
+    elevation: 355,
+  },
+  {
+    code: "LYBJ",
+    frequency: "119.825",
+    elevation: 233,
+  },
 ];
