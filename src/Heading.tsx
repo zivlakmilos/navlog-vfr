@@ -57,6 +57,7 @@ const Heading: Component = () => {
       newHeading.frequency = heading[newId - 1].frequency;
       newHeading.variation = heading[newId - 1].variation;
       newHeading.altitude = heading[newId - 1].altitude;
+      newHeading.airSpeed = heading[newId - 1].airSpeed;
     }
 
     setHeading([...heading, newHeading]);
