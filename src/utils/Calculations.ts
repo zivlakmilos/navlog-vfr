@@ -23,15 +23,31 @@ const timeStrToInt = (str: string): number => {
   return res;
 }
 
+const roundHeading = (heading: number): number => {
+  heading = Math.round(heading);
+
+  if (heading < 0) {
+    heading = 360 - heading;
+  }
+
+  heading = heading % 360;
+
+  if (heading === 0) {
+    heading = 360;
+  }
+
+  return heading;
+}
+
 export const calculateHeading = (heading: THeadingStore, weather: TWeatherStore, airplane: TAirplane): THeadingStore => {
   const res: THeadingStore = heading;
 
   const wca = Math.round(calculateWindCorrectionAngle(res.trueCourse, res.airSpeed, weather.windDirection, weather.windSpeed));
   res.windCorrectionAngle = wca;
-  res.trueHeading = Math.round(res.trueCourse + wca);
-  res.magneticHeading = Math.round(res.trueHeading + res.variation);
-  res.deviation = airplane.deviationCalc(res.magneticHeading);
-  res.heading = Math.round(res.magneticHeading + res.deviation);
+  res.trueHeading = roundHeading(res.trueCourse + wca);
+  res.magneticHeading = roundHeading(res.trueHeading + res.variation);
+  res.deviation = roundHeading(airplane.deviationCalc(res.magneticHeading));
+  res.heading = roundHeading(res.magneticHeading + res.deviation);
 
   res.groudSpeed = Math.round(calculateGroundSpeed(res.trueCourse, res.airSpeed, weather.windDirection, weather.windSpeed, wca));
   res.ete = Math.ceil(res.distLeg / res.airSpeed * 60);
