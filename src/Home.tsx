@@ -13,6 +13,38 @@ const Home: Component = () => {
   const [weatherInfo, setWeatherInfo] = weatherStore;
   const [heading, setHeading] = headingStore;
 
+  const fetchWeather = () => {
+    const airport = weatherInfo().airport;
+
+    fetch(`https://navlog.zivlak.rs/weather/metar?ids=${airport}&format=json`)
+      .then(res => res.json())
+      .then(data => {
+        if (!data.length) {
+          return;
+        }
+        setWeatherInfo(prev => {
+          prev.metar = data[0].rawOb;
+          prev.windDirection = data[0].wdir;
+          prev.windSpeed = data[0].wspd;
+          return prev;
+        });
+      })
+      .catch(err => console.error(err));
+
+    fetch(`https://navlog.zivlak.rs/weather/taf?ids=${airport}&format=json`)
+      .then(res => res.json())
+      .then(data => {
+        if (!data.length) {
+          return;
+        }
+        setWeatherInfo(prev => {
+          prev.taf = data[0].rawTAF;
+          return prev;
+        });
+      })
+      .catch(err => console.error(err));
+  }
+
   const updateGeneralInfo = (key: keyof TGeneralStore, val: any) => {
     setGeneralInfo(prev => {
       prev[key] = val;
@@ -86,6 +118,8 @@ const Home: Component = () => {
 
   const loadFileInput = <input type="file" onChange={(e) => onFileLoaded(e.target.files)} hidden={true} accept=".navlog" /> as HTMLInputElement;
 
+  fetchWeather();
+
   return (
     <div class="w-full p-5">
       <div class="collapse collapse-arrow bg-base-100 border border-base-300 m-5">
@@ -139,6 +173,11 @@ const Home: Component = () => {
         <div class="collapse-title font-semibold">Weather</div>
         <div class="collapse-content text-sm">
           <form class="w-full">
+            <fieldset class="fieldset">
+              <legend class="fieldset-legend">Airport:</legend>
+              <input type="text" class="input" value={weatherInfo().airport} onInput={e => updateWeatherInfo("airport", e.target.value)} />
+            </fieldset>
+            <button type="button" class="btn btn-primary" onClick={fetchWeather}>Get Weather</button>
             <fieldset class="fieldset">
               <legend class="fieldset-legend">METAR:</legend>
               <input type="text" class="input w-full" value={weatherInfo().metar} onInput={e => updateWeatherInfo("metar", e.target.value)} />

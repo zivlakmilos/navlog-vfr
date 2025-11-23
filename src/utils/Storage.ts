@@ -32,6 +32,7 @@ export const generalStore = createSignal<TGeneralStore>({
 }, { equals: false });
 
 export type TWeatherStore = {
+  airport: string,
   metar: string,
   taf: string,
   windDirection: number,
@@ -39,6 +40,7 @@ export type TWeatherStore = {
 }
 
 export const weatherStore = createSignal<TWeatherStore>({
+  airport: "LYBT",
   metar: "",
   taf: "",
   windDirection: 0,
