@@ -29,8 +29,32 @@ export const saveNavLog = (generalInfo: TGeneralStore, weatherData: TWeatherStor
 
   const encoder = new TextEncoder();
   const buff = encoder.encode(json);
-  downloadFile(buff, "navlog.json", "application/json");
+  downloadFile(buff, "route.navlog", "application/json");
 }
 
-export const loadNavLog = () => {
+export const loadNavLog = (file: File) => {
+  type TRes = {
+    generalInfo: TGeneralStore,
+    weatherData: TWeatherStore,
+    headings: THeadingStore[],
+  };
+
+  return new Promise<TRes>((res, rej) => {
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+      try {
+        const json = JSON.parse(e.target.result as string);
+        res(json);
+      } catch (error) {
+        rej((`Error parsing JSON: ${error}`));
+      }
+    };
+
+    reader.onerror = function (e) {
+      rej((`Error reading file: ${e.target.error}`));
+    };
+
+    reader.readAsText(file);
+  });
 }

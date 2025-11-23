@@ -4,14 +4,14 @@ import { A } from '@solidjs/router';
 import { airplanes, airports, TAirplane } from './utils/Data';
 import { downloadFile, printNavLog } from './utils/Print';
 import { calculateAll } from './utils/Calculations';
-import { saveNavLog } from './utils/File';
+import { loadNavLog, saveNavLog } from './utils/File';
 
 // Get wind: https://aviationweather.gov/api/data/metar?ids=LYBE&format=json
 
 const Home: Component = () => {
   const [generalInfo, setGeneralInfo] = generalStore;
   const [weatherInfo, setWeatherInfo] = weatherStore;
-  const [heading] = headingStore;
+  const [heading, setHeading] = headingStore;
 
   const updateGeneralInfo = (key: keyof TGeneralStore, val: any) => {
     setGeneralInfo(prev => {
@@ -50,7 +50,20 @@ const Home: Component = () => {
     });
   }
 
-  const onLoadClicked = () => {
+  const onFileLoaded = async (files: FileList) => {
+    try {
+      if (files.length !== 1) {
+        return;
+      }
+
+      const file = files[0];
+      const data = await loadNavLog(file);
+      setGeneralInfo(data.generalInfo);
+      setWeatherInfo(data.weatherData);
+      setHeading(data.headings);
+    } catch (ex) {
+      console.error(ex);
+    }
   }
 
   const onSaveClicked = () => {
@@ -63,14 +76,15 @@ const Home: Component = () => {
       alert("Airplane not selected!");
     }
 
-    calculateAll(generalInfo(), heading, weatherInfo(), airplane);
-    const bytes = await printNavLog(generalInfo(), heading, weatherInfo(), airplane);
-    // downloadFile(bytes, "navlog.pdf", "application/pdf");
+    const headings = calculateAll(generalInfo(), heading, weatherInfo(), airplane);
+    const bytes = await printNavLog(generalInfo(), headings, weatherInfo(), airplane);
 
     const blob = new Blob([bytes] as BlobPart[], { type: "application/pdf" });
     const fileURL = URL.createObjectURL(blob);
     window.open(fileURL, '_blank');
   }
+
+  const loadFileInput = <input type="file" onChange={(e) => onFileLoaded(e.target.files)} hidden={true} accept=".navlog" /> as HTMLInputElement;
 
   return (
     <div class="w-full p-5">
@@ -79,7 +93,8 @@ const Home: Component = () => {
         <div class="collapse-title font-semibold">General Info</div>
         <div class="collapse-content text-sm">
           <form class="w-full">
-            <button class="btn btn-primary" type="button" onClick={onLoadClicked}>Load</button>
+            {loadFileInput}
+            <button class="btn btn-primary" type="button" onClick={() => loadFileInput.click()}>Load</button>
             &nbsp;&nbsp;&nbsp;
             <button class="btn btn-primary" type="button" onClick={onSaveClicked}>Save</button>
             &nbsp;&nbsp;&nbsp;
