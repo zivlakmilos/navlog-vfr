@@ -54,10 +54,6 @@ const printHeader = (pdf: PDFPage, generalInfo: TGeneralStore, airplane: TAirpla
 const printHeadings = (pdf: PDFPage, generalInfo: TGeneralStore, headings: THeadingStore[]) => {
   const heightDif = 29;
 
-  let totalFuel = 0;
-  let totalDist = 0;
-  let totalTime = 0;
-
   for (let i = 0; i < headings.length; i++) {
     const heading = headings[i];
     const height = heightDif * i;
@@ -175,10 +171,6 @@ const printHeadings = (pdf: PDFPage, generalInfo: TGeneralStore, headings: THead
       size: 8,
       color: rgb(1, 0, 0),
     });
-
-    totalFuel += heading.fuelLeg;
-    totalDist += heading.distLeg;
-    totalTime += heading.corr;
   }
 }
 
@@ -193,6 +185,7 @@ const printTotals = (pdf: PDFPage, generalInfo: TGeneralStore, headings: THeadin
     totalDist += heading.distLeg;
     totalTime += heading.corr;
   }
+  totalTime += 15;
 
   const taxiFuel = airplane.taxiFuel;
 
