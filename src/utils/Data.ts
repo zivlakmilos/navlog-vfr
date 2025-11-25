@@ -3,6 +3,7 @@ export type TAirplane = {
   model: string,
   fuelPerH: number,
   maxFuel: number,
+  taxiFuel: number,
   deviationCalc: (heading: number) => number,
 };
 
@@ -12,6 +13,7 @@ export const airplanes: TAirplane[] = [
     model: "DA-20",
     fuelPerH: 17,
     maxFuel: 74,
+    taxiFuel: 5,
     deviationCalc: function (heading: number): number {
       const table = {
         0: -2,

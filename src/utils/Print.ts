@@ -147,22 +147,31 @@ const printHeadings = (pdf: PDFPage, generalInfo: TGeneralStore, headings: THead
       size: 8,
     });
     pdf.moveTo(337, 390 - height);
-    pdf.drawText(floatToStr(heading.distRem, 2), {
+    pdf.drawText(floatToStr(Math.abs(heading.distRem), 2), {
       size: 8,
     });
 
+    let ete = heading.ete;
+    let corr = heading.corr;
+    if (i === 0) {
+      ete += 10;
+      corr += 10;
+    } else if (i === headings.length - 1) {
+      ete += 5;
+      corr += 5;
+    }
     pdf.moveTo(365, 403 - height);
-    pdf.drawText(timeToStr(heading.ete), {
+    pdf.drawText(timeToStr(ete), {
       size: 8,
     });
     pdf.moveTo(365, 390 - height);
-    pdf.drawText(timeToStr(heading.corr), {
+    pdf.drawText(timeToStr(corr), {
       size: 8,
       color: rgb(1, 0, 0),
     });
 
     pdf.moveTo(392, 403 - height);
-    pdf.drawText(timeToStr(heading.eta), {
+    pdf.drawText(timeToStr(heading.eta + 10), {
       size: 8,
       color: rgb(1, 0, 0),
     });
@@ -185,9 +194,11 @@ const printTotals = (pdf: PDFPage, generalInfo: TGeneralStore, headings: THeadin
     totalTime += heading.corr;
   }
 
+  const taxiFuel = airplane.taxiFuel;
+
   const contiquency = totalFuel * 5 / 100;
   const fuel45min = airplane.fuelPerH / 60 * 45;
-  const required = totalFuel + 2 * fuel45min + contiquency;
+  const required = totalFuel + 2 * fuel45min + contiquency + taxiFuel;
   const loaded = generalInfo.loadedFuel;
   const extraFuel = loaded - required;
 
@@ -204,6 +215,18 @@ const printTotals = (pdf: PDFPage, generalInfo: TGeneralStore, headings: THeadin
     size: 8,
   });
 
+  pdf.moveTo(37, 129);
+  pdf.drawText("Taxi fuel:", {
+    size: 8,
+  });
+  pdf.moveTo(115, 129);
+  pdf.drawText(floatToStr(taxiFuel, 2), {
+    size: 8,
+  });
+  pdf.moveTo(147, 129);
+  pdf.drawText(timeToStr(Math.ceil(taxiFuel / (airplane.fuelPerH / 60))), {
+    size: 8,
+  });
   pdf.moveTo(115, 103);
   pdf.drawText(floatToStr(totalFuel, 2), {
     size: 8,
