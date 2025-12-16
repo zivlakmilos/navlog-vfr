@@ -58,3 +58,99 @@ export const loadNavLog = (file: File) => {
     reader.readAsText(file);
   });
 }
+
+export const importFromLittleNavMap = (file: File) => {
+  type TRes = {
+    generalInfo: TGeneralStore,
+    weatherData: TWeatherStore,
+    headings: THeadingStore[],
+  };
+
+  return new Promise<TRes>((res, rej) => {
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+      try {
+        const data: TRes = {
+          generalInfo: {
+            airplane: "",
+            departure: "",
+            destination: "",
+            date: "",
+            time: "",
+            loadedFuel: 0,
+            alternate1: "",
+            alternate1Frequency: "",
+            alternate2: "",
+            alternate2Frequency: "",
+            alternate3: "",
+            alternate3Frequency: ""
+          },
+          weatherData: {
+            airport: "",
+            metar: "",
+            taf: "",
+            windDirection: 0,
+            windSpeed: 0
+          },
+          headings: []
+        }
+        const html = e.target.result as string;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+
+        const rows = doc.querySelectorAll('tr');
+
+        data.generalInfo.departure = doc.querySelectorAll('tr')[1].querySelectorAll("td")[1].innerText;
+        data.generalInfo.destination = doc.querySelectorAll('tr')[rows.length - 1].querySelectorAll("td")[1].innerText;
+
+        for (let i = 2; i < rows.length; i++) {
+          const row = rows[i];
+          const cols = rows[i].querySelectorAll("td");
+          const from = rows[i - 1].querySelectorAll("td")[1].innerText;
+          const to = cols[1].innerText;
+          const trueCourse = cols[11].innerText;
+          const distance = cols[12].innerText;
+          const altitude = cols[20].innerText;
+          const variation = cols[24].innerText;
+
+          const heading: THeadingStore = {
+            id: i - 2,
+            from: from,
+            to: to,
+            frequency: "",
+            trueCourse: parseInt(trueCourse),
+            windCorrectionAngle: 0,
+            trueHeading: 0,
+            variation: parseFloat(variation),
+            magneticHeading: 0,
+            deviation: 0,
+            heading: 0,
+            altitude: parseFloat(altitude.replaceAll(",", "")),
+            airSpeed: 0,
+            groudSpeed: 0,
+            fuelLeg: 0,
+            fuelRem: 0,
+            distLeg: parseFloat(distance),
+            distRem: 0,
+            ete: 0,
+            corr: 0,
+            eta: 0,
+            ata: 0
+          }
+          data.headings.push(heading);
+        }
+
+        res(data);
+      } catch (error) {
+        rej((`Error parsing JSON: ${error}`));
+      }
+    };
+
+    reader.onerror = function (e) {
+      rej((`Error reading file: ${e.target.error}`));
+    };
+
+    reader.readAsText(file);
+  });
+}

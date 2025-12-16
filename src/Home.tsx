@@ -4,7 +4,7 @@ import { A, useNavigate } from '@solidjs/router';
 import { airplanes, airports } from './utils/Data';
 import { printNavLog } from './utils/Print';
 import { calculateAll } from './utils/Calculations';
-import { loadNavLog, saveNavLog } from './utils/File';
+import { importFromLittleNavMap, loadNavLog, saveNavLog } from './utils/File';
 
 // Get wind: https://aviationweather.gov/api/data/metar?ids=LYBE&format=json
 
@@ -100,6 +100,26 @@ const Home: Component = () => {
     }
   }
 
+  const onLittleNavMapLoaded = async (files: FileList) => {
+    try {
+      if (files.length !== 1) {
+        return;
+      }
+
+      const file = files[0];
+      const data = await importFromLittleNavMap(file);
+      setGeneralInfo(prev => ({
+        ...prev,
+        departure: data.generalInfo.departure,
+        destination: data.generalInfo.destination,
+      }));
+      setWeatherInfo(data.weatherData);
+      setHeading(data.headings);
+    } catch (ex) {
+      console.error(ex);
+    }
+  }
+
   const onSaveClicked = () => {
     saveNavLog(generalInfo(), weatherInfo(), heading);
   }
@@ -108,7 +128,7 @@ const Home: Component = () => {
     navigate(`/heading/${id}`);
   }
 
-  const onHeadingDeleteClicked = (id: number) => {
+  const onHeadingDeleteCicked = (id: number) => {
     setHeading(prev => prev.filter(e => e.id !== id).map((e, idx) => ({ ...e, id: idx })));
   }
 
@@ -127,6 +147,7 @@ const Home: Component = () => {
   }
 
   const loadFileInput = <input type="file" onChange={(e) => onFileLoaded(e.target.files)} hidden={true} accept=".navlog" /> as HTMLInputElement;
+  const importFromLittleNavMapFileInput = <input type="file" onChange={(e) => onLittleNavMapLoaded(e.target.files)} hidden={true} accept=".html" /> as HTMLInputElement;
 
   fetchWeather();
 
@@ -138,13 +159,14 @@ const Home: Component = () => {
         <div class="collapse-content text-sm">
           <form class="w-full">
             {loadFileInput}
+            {importFromLittleNavMapFileInput}
             <button class="btn btn-primary" type="button" onClick={() => loadFileInput.click()}>Load</button>
             &nbsp;&nbsp;&nbsp;
             <button class="btn btn-primary" type="button" onClick={onSaveClicked}>Save</button>
             &nbsp;&nbsp;&nbsp;
             &nbsp;&nbsp;&nbsp;
             &nbsp;&nbsp;&nbsp;
-            <button class="btn btn-primary" type="button">Import from LittleNavMap</button>
+            <button class="btn btn-primary" type="button" onClick={() => importFromLittleNavMapFileInput.click()}>Import from LittleNavMap</button>
             <fieldset class="fieldset">
               <legend class="fieldset-legend">Airplane:</legend>
               <select class="select" onChange={e => onAirplaneChanged(e.target.value)}>
