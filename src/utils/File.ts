@@ -1,3 +1,5 @@
+import { calculateAll } from "./Calculations";
+import { TAirplane } from "./Data";
 import { TGeneralStore, THeadingStore, TWeatherStore } from "./Storage";
 
 const downloadFile = (data: Uint8Array, filename: string, type: string) => {
@@ -59,7 +61,7 @@ export const loadNavLog = (file: File) => {
   });
 }
 
-export const importFromLittleNavMap = (file: File) => {
+export const importFromLittleNavMap = (file: File, generalInfo: TGeneralStore, weatherData: TWeatherStore, airplane: TAirplane, airSpeed: number) => {
   type TRes = {
     generalInfo: TGeneralStore,
     weatherData: TWeatherStore,
@@ -72,28 +74,9 @@ export const importFromLittleNavMap = (file: File) => {
     reader.onload = function (e) {
       try {
         const data: TRes = {
-          generalInfo: {
-            airplane: "",
-            departure: "",
-            destination: "",
-            date: "",
-            time: "",
-            loadedFuel: 0,
-            alternate1: "",
-            alternate1Frequency: "",
-            alternate2: "",
-            alternate2Frequency: "",
-            alternate3: "",
-            alternate3Frequency: ""
-          },
-          weatherData: {
-            airport: "",
-            metar: "",
-            taf: "",
-            windDirection: 0,
-            windSpeed: 0
-          },
-          headings: []
+          generalInfo: { ...generalInfo },
+          weatherData: { ...weatherData },
+          headings: [],
         }
         const html = e.target.result as string;
         const parser = new DOMParser();
@@ -105,14 +88,17 @@ export const importFromLittleNavMap = (file: File) => {
         data.generalInfo.destination = doc.querySelectorAll('tr')[rows.length - 1].querySelectorAll("td")[1].innerText;
 
         for (let i = 2; i < rows.length; i++) {
-          const row = rows[i];
           const cols = rows[i].querySelectorAll("td");
           const from = rows[i - 1].querySelectorAll("td")[1].innerText;
           const to = cols[1].innerText;
           const trueCourse = cols[11].innerText;
           const distance = cols[12].innerText;
-          const altitude = cols[20].innerText;
+          let altitude = cols[20].innerText;
           const variation = cols[24].innerText;
+
+          if (i === rows.length - 1) {
+            altitude = doc.querySelectorAll("tr")[i - 1].querySelectorAll("td")[20].innerText;
+          }
 
           const heading: THeadingStore = {
             id: i - 2,
@@ -127,7 +113,7 @@ export const importFromLittleNavMap = (file: File) => {
             deviation: 0,
             heading: 0,
             altitude: parseFloat(altitude.replaceAll(",", "")),
-            airSpeed: 0,
+            airSpeed: airSpeed,
             groudSpeed: 0,
             fuelLeg: 0,
             fuelRem: 0,
@@ -141,6 +127,7 @@ export const importFromLittleNavMap = (file: File) => {
           data.headings.push(heading);
         }
 
+        data.headings = calculateAll(data.generalInfo, data.headings, data.weatherData, airplane);
         res(data);
       } catch (error) {
         rej((`Error parsing JSON: ${error}`));

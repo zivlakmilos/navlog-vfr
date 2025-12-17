@@ -100,20 +100,31 @@ const Home: Component = () => {
     }
   }
 
+  const onImportLittleNavMapClicked = () => {
+    importFromLittleNavMapFileInput.click();
+  }
+
   const onLittleNavMapLoaded = async (files: FileList) => {
     try {
       if (files.length !== 1) {
         return;
       }
 
+      const airplane = airplanes.find(el => el.registration === generalInfo().airplane);
+
+      let airSpeed = 80;
+      let airSpeedTxt = prompt("Air Speed", airSpeed.toString());
+      if (airSpeedTxt != null && airSpeedTxt != "") {
+        airSpeed = +airSpeedTxt
+      }
+
       const file = files[0];
-      const data = await importFromLittleNavMap(file);
+      const data = await importFromLittleNavMap(file, generalInfo(), weatherInfo(), airplane, airSpeed);
       setGeneralInfo(prev => ({
         ...prev,
         departure: data.generalInfo.departure,
         destination: data.generalInfo.destination,
       }));
-      setWeatherInfo(data.weatherData);
       setHeading(data.headings);
     } catch (ex) {
       console.error(ex);
