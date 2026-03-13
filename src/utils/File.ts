@@ -108,7 +108,7 @@ export const importFromLittleNavMap = (file: File, generalInfo: TGeneralStore, w
             trueCourse: parseInt(trueCourse),
             windCorrectionAngle: 0,
             trueHeading: 0,
-            variation: parseFloat(variation),
+            variation: variation.endsWith("E") ? -parseFloat(variation) : parseFloat(variation),
             magneticHeading: 0,
             deviation: 0,
             heading: 0,
