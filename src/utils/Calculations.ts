@@ -51,7 +51,7 @@ export const calculateHeading = (heading: THeadingStore, weather: TWeatherStore,
 
   res.groudSpeed = Math.round(calculateGroundSpeed(res.trueCourse, res.airSpeed, weather.windDirection, weather.windSpeed, wca));
   res.ete = Math.ceil(res.distLeg / res.airSpeed * 60);
-  res.corr = Math.ceil(res.distLeg / res.airSpeed * 60);
+  res.corr = Math.ceil(res.distLeg / res.groudSpeed * 60);
 
   res.fuelLeg = res.corr * (airplane.fuelPerH / 60);
 
@@ -68,7 +68,7 @@ export const calculateAll = (generalInfo: TGeneralStore, headings: THeadingStore
     headings[i] = calculateHeading(headings[i], weather, airplane);
     totalDistance += headings[i].distLeg;
 
-    currTime += headings[i].ete;
+    currTime += headings[i].corr;
     headings[i].eta = currTime;
   }
 
